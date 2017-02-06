@@ -1,0 +1,313 @@
+which git command
+
+ 
+
+git --version
+
+ 
+
+Unix
+
+ 
+
+System
+
+/etc/gitconfig
+
+ 
+
+User
+
+~/.gitconfig
+
+ 
+
+Project
+
+ 
+
+/.git/config
+
+ 
+
+ 
+
+Config -
+
+ 
+
+                git config --system
+
+               
+
+                git config --global (for user)
+
+               
+
+                git config --list
+
+               
+
+cat .gitconfig [shows git config settings on Linux]
+
+ 
+
+git-completion can be downloaded in unix and called from .bashrc to load and allow autocompletion of git commands
+
+ 
+
+if ... fi (fi closes an if in Shell scripting)
+
+ 
+
+initialize a project
+
+ 
+
+                git init - run in the folder to track to start tracking as a repository   - creates .git directory (its workspace)
+
+               
+
+                git add .
+
+                git commit -m "Initial commit"
+
+ 
+
+git log (shows history of commits) also can use since, until and author and numbers to filter commits.
+
+ 
+
+git log --grep="Init" scans log for items with Init in text
+
+ 
+
+add - adds selected items to Staging index
+
+commit - adds selected items from Staging index to repository
+
+ 
+
+Note: allows you to be selective of the changes.
+
+ 
+
+three braches - Working / Staging index / Repository
+
+ 
+
+git commits are snapshots
+
+git uses checksums to confirm content in a commit
+
+SHA-1 hash is used to calculate checksum - 40 char hexadecimal
+
+ 
+
+HEAD - pointer to tip of current checked out branch in repo. parent of next commit
+
+ 
+
+within .git/HEAD file shows the branch  points to refs/heads/master this file holds the commit number
+
+ 
+
+git status - compares working directory to repo  Changes to be committed and Untracked files
+
+ 
+
+git uses diff to compare files
+
+ 
+
+git diff shows what changed in the working directory to the staging and repository and will show the line numbers
+
+ 
+
+get diff --staged ( shows changes between staging index and repo )
+
+ 
+
+git add/rm (will add or remove files deleted from working directory to staging)
+
+ 
+
+or git rm (to remove from the directory - note will not use wastebasket)
+
+ 
+
+git mv - used to rename files. 
+
+ 
+
+mv a file manually will have the git identify and new and deleted file in staging. 
+
+ 
+
+git checkout -- hello.txt (restores hello.txt file or directory from the current branch - the double dashes to the working directory)
+
+git reset HEAD (un stages a change in the staging index)
+
+git commit --amend -m "blah blah" (updates the last commit with the stage changes can also update the commit memo)
+
+ 
+
+git checkout SHA1234567 -- filename.html ( restores filename.html from commit SHA1234567 into the staging index not working dir)
+
+git diff --staged will compare to old version
+
+ 
+
+git revert SHA1234567 (reverts all the changes for that SHA)
+
+ 
+
+git reset (moves the HEAD pointer to unwind to a previous commit)
+
+git reset --soft SHA1234567 (moves HEAD pointer to SHA1234567 but doesn't reset staging or working directory so you can diff and see everything - SAFEST subsequent commits are still there and can be pointed to )
+
+git reset --mixed SHA1234567 (DEFAULT behavior moves HEAD, updates staging directory - BUT not working directory)
+
+git reset --hard SHA1234567(obliterates any changes made after the HEAD overwrites both staging and working dir from repo)
+
+ 
+
+git clean (removes un tracked files form working directory -n does a test run / -f forces the clean)
+
+.gitignore (files to ignore in working directory either file names or regex)
+
+               
+
+nano .gitignore
+
+ 
+
+git rm --cached text.txt (removes a previously tracked file from the index)
+
+ 
+
+git doesn't track empty directories - to force the directory to be tracked, you need to create a file in the directory.  By conventions do a touch .gitkeep in the directory to create an empty file.
+
+ 
+
+tree-ish
+
+ 
+
+git ls-tree HEAD (files in the repo at the head)
+
+ 
+
+git ls-tree MASTER (files in head of master)
+
+ 
+
+git ls-tree master^ (files in previous commit) 
+
+ 
+
+tree = directory / blob = file
+
+ 
+
+git log --oneline (compact view of log)
+
+ 
+
+grep - global regular expression search
+
+ 
+
+git log sha1234567.. index.html (shows any commits that impacted index.html)
+
+ 
+
+git log --oneline --graph --all --decorate
+
+ 
+
+git show sha1234567 (show details of commit including diffs) - show requires a tree-ish
+
+ 
+
+git diff sha1234567 (shows diffs in directory in commit sha1234567 and the working directory)
+
+ 
+
+git diff sha1234567..sha2345678 (any diffs between these tree-ishs)
+
+ 
+
+switching branches will swap all files in the working directory - you only have one working directory
+
+ 
+
+git branch (lists all branches on your machine - with asterisk to current branch)
+
+ 
+
+git branch new_feature (creates a new branch named new_feature)
+
+ 
+
+git checkout new_feature (switches to new branch)
+
+ 
+
+git checkout -b shorten_title (create / checkout/ switch to branch named shorten_title)
+
+ 
+
+you cannot checkout a branch until unless the working directoryt is "mostly" clean - no direct conflicts
+
+ 
+
+git diff master..branch (lists changes between the tip of the master branch and the tip of branch)
+
+ 
+
+git branch --merged (shows which branches are completely included in the current branch)
+
+ 
+
+git branch -m branch1 branch2 (renames branch1 to branch2)
+
+ 
+
+echo $PS1 - shows the prompt string in unix
+
+ 
+
+export PS1='>>>>' sets the prompt to >>>>
+
+ 
+
+export PS1='$(__git_ps1 "(%s)") > '   [ adds branch to prompt ]  to make the change permanent these changes need to go into either .bash_profile or bashrc
+
+ 
+
+to merge changes:
+
+                1) checkout branch to receive changes
+
+                2) git merge branch_name
+
+               
+
+Always run git merge with a clean working directory
+
+ 
+
+fast forward merge vs. true merge
+
+ 
+
+fast forward - just merges the commit from the branch into the target branch (where target branch hasn't progressed from branch to merge)
+
+ 
+
+git merge --no-ff branch (forces a new commit to track a fast forward merge of a branch)
+
+ 
+
+merge conflicts options: abort, resolve manually, use a merge tool
