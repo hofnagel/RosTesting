@@ -1,0 +1,5 @@
+sudo apt-get install qemu-system-arm
+
+file <pi's distro image>.img
+
+

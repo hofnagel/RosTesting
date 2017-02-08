@@ -1,0 +1,442 @@
+ROS commands:
+
+catkin 
+
+catkin_create_pkg - creates a package with and listed dependencies
+i.e. 
+
+
+paul@paul-VirtualBox:~/catkin_ws/src$ catkin_create_pkg beginner_tutorials std_msgs rospy roscpp
+Created file beginner_tutorials/package.xml
+Created file beginner_tutorials/CMakeLists.txt
+Created folder beginner_tutorials/include/beginner_tutorials
+Created folder beginner_tutorials/src
+Successfully created files in /home/paul/catkin_ws/src/beginner_tutorials. Please adjust the values in package.xml.
+
+paul@paul-VirtualBox:~/catkin_ws/src$ ls -lr
+total 4
+lrwxrwxrwx 1 paul paul   47 Feb  6 15:12 CMakeLists.txt -> /opt/ros/jade/share/catkin/cmake/toplevel.cmake
+drwxrwxr-x 4 paul paul 4096 Feb  7 18:24 beginner_tutorials
+
+Running catkin_make to build a package:
+
+
+paul@paul-VirtualBox:~/catkin_ws$ catkin_make
+Base path: /home/paul/catkin_ws
+Source space: /home/paul/catkin_ws/src
+Build space: /home/paul/catkin_ws/build
+Devel space: /home/paul/catkin_ws/devel
+Install space: /home/paul/catkin_ws/install
+####
+#### Running command: "cmake /home/paul/catkin_ws/src -DCATKIN_DEVEL_PREFIX=/home/paul/catkin_ws/devel -DCMAKE_INSTALL_PREFIX=/home/paul/catkin_ws/install -G Unix Makefiles" in "/home/paul/catkin_ws/build"
+####
+-- Using CATKIN_DEVEL_PREFIX: /home/paul/catkin_ws/devel
+-- Using CMAKE_PREFIX_PATH: /opt/ros/jade
+-- This workspace overlays: /opt/ros/jade
+-- Using PYTHON_EXECUTABLE: /usr/bin/python
+-- Using Debian Python package layout
+-- Using empy: /usr/bin/empy
+-- Using CATKIN_ENABLE_TESTING: ON
+-- Call enable_testing()
+-- Using CATKIN_TEST_RESULTS_DIR: /home/paul/catkin_ws/build/test_results
+-- Found gtest sources under '/usr/src/gtest': gtests will be built
+-- Using Python nosetests: /usr/bin/nosetests-2.7
+-- catkin 0.6.18
+-- BUILD_SHARED_LIBS is on
+-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-- ~~  traversing 1 packages in topological order:
+-- ~~  - beginner_tutorials
+-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-- +++ processing catkin package: 'beginner_tutorials'
+-- ==> add_subdirectory(beginner_tutorials)
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/paul/catkin_ws/build
+####
+#### Running command: "make -j1 -l1" in "/home/paul/catkin_ws/build"
+####
+paul@paul-VirtualBox:~/catkin_ws$ 
+
+devel subfolder will match /opt/ros/jade (jade = $ROSDISTRO_NAME)
+
+Note: to run commands like rospack you need to source the generated file with: > . ~/catkin_ws/devel/setup.bash
+
+rospack will allow you to check dependencies of the package. E.g. rospack depends1 beginners_tutorials will list the first order dependencies - roscpp rospy std_msgs
+
+rospack will also give the dependencies for the dependencies - i.e. rospack rospy will list the dependencies for the Ros Python module
+
+paul@paul-VirtualBox:~/catkin_ws/src/beginner_tutorials$ source /opt/ros/jade/setup.bash
+
+
+
+	Base path: /home/paul/catkin_ws/src/beginner_tutorials
+	The specified base path "/home/paul/catkin_ws/src/beginner_tutorials" contains a package but "catkin_make" must be invoked in the root of workspace
+	paul@paul-VirtualBox:~/catkin_ws/src/beginner_tutorials$ ls
+	CMakeLists.txt  include  package.xml  package.xml~  src
+	paul@paul-VirtualBox:~/catkin_ws/src/beginner_tutorials$ 
+
+ROS - Tutorials Building Packages:
+
+	"The build folder is the default location of the build space and is where cmake and make are called to configure and build your packages. 
+	The devel folder is the default location of the devel space, which is where your executables and libraries go before you install your packages." 
+
+ROS
+
+From Ros Tutorials Understanding Nodes...
+
+	Nodes: A node is an executable that uses ROS to communicate with other nodes.
+	Messages: ROS data type used when subscribing or publishing to a topic.
+	Topics: Nodes can publish messages to a topic as well as subscribe to a topic to receive messages.
+	Master: Name service for ROS (i.e. helps nodes find each other)
+	rosout: ROS equivalent of stdout/stderr
+	roscore: Master + rosout + parameter server (parameter server will be introduced later) 
+
+
+Running roscore will give the following output:
+
+	paul@paul-VirtualBox:~/catkin_ws$ roscore
+	... logging to /home/paul/.ros/log/71784b68-ed96-11e6-b6a6-080027544776/roslaunch-paul-VirtualBox-3145.log
+	Checking log directory for disk usage. This may take awhile.
+	Press Ctrl-C to interrupt
+	Done checking log file disk usage. Usage is <1GB.
+
+	started roslaunch server http://paul-VirtualBox:43533/
+	ros_comm version 1.11.20
+
+
+	SUMMARY
+	========
+
+	PARAMETERS
+	 * /rosdistro: jade
+	 * /rosversion: 1.11.20
+
+	NODES
+
+	auto-starting new master
+	process[master]: started with pid [3157]
+	ROS_MASTER_URI=http://paul-VirtualBox:11311/
+
+	setting /run_id to 71784b68-ed96-11e6-b6a6-080027544776
+	process[rosout-1]: started with pid [3170]
+	started core service [/rosout]
+
+Running ps -ef will show the following:
+
+	paul      3145  2373  0 19:35 pts/0    00:00:00 /usr/bin/python /opt/ros/jade/bi
+	paul      3157  3145  0 19:35 ?        00:00:00 /usr/bin/python /opt/ros/jade/bi
+	paul      3170  3145  0 19:35 ?        00:00:00 /opt/ros/jade/lib/rosout/rosout 
+	paul      3192  2365  0 19:36 pts/9    00:00:00 bash
+
+rosnode list -> lists nodes - for example from the tutorial build /rosout
+
+rosnode info - gives information on a node.
+
+For example: 
+
+	paul@paul-VirtualBox:~$ rosnode info /rosout
+	--------------------------------------------------------------------------------
+	Node [/rosout]
+	Publications: 
+	 * /rosout_agg [rosgraph_msgs/Log]
+
+	Subscriptions: 
+	 * /rosout [unknown type]
+
+	Services: 
+	 * /rosout/set_logger_level
+	 * /rosout/get_loggers
+
+
+	contacting node http://paul-VirtualBox:46233/ ...
+	Pid: 3170
+
+rosrun will run the executable on the node for example:
+
+	rosrun turtlesim turtlesim_node
+
+will run the ROS turtle sim:
+
+	paul@paul-VirtualBox:~$ rosrun turtlesim turtlesim_node
+	[ INFO] [1486515352.039192774]: Starting turtlesim with node name /turtlesim
+	[ INFO] [1486515352.045061430]: Spawning turtle [turtle1] at x=[5.544445], y=[5.544445], theta=[0.000000]
+
+ps -ef will show the new node: 
+
+paul      3262  3192  3 19:55 pts/9    00:00:08 /opt/ros/jade/lib/turtlesim/turt
+
+	paul@paul-VirtualBox:~$ rosrun turtlesim turtlesim_node __name:=my_turtle
+	[ INFO] [1486515798.544560753]: Starting turtlesim with node name /my_turtle
+	[ INFO] [1486515798.551169859]: Spawning turtle [turtle1] at x=[5.544445], y=[5.544445], theta=[0.000000]
+
+paul      3389  3192  4 20:03 pts/9    00:00:01 /opt/ros/jade/lib/turtlesim/turtlesim_node __name:=my_turtle
+
+	paul@paul-VirtualBox:~$ rosnode list
+	/my_turtle
+	/rosout
+
+ping will ping the named node to see if it is up, for example:
+
+	paul@paul-VirtualBox:~$ rosnode ping my_turtle
+	rosnode: node is [/my_turtle]
+	pinging /my_turtle with a timeout of 3.0s
+	xmlrpc reply from http://paul-VirtualBox:37177/	time=0.363827ms
+	xmlrpc reply from http://paul-VirtualBox:37177/	time=1.222134ms
+
+
+
+paul@paul-VirtualBox:~$ rosnode info /teleop_turtle
+--------------------------------------------------------------------------------
+Node [/teleop_turtle]
+Publications: 
+ * /turtle1/cmd_vel [geometry_msgs/Twist]
+ * /rosout [rosgraph_msgs/Log]
+
+Subscriptions: None
+
+Services: 
+ * /teleop_turtle/get_loggers
+ * /teleop_turtle/set_logger_level
+
+
+contacting node http://paul-VirtualBox:36478/ ...
+Pid: 3613
+Connections:
+ * topic: /rosout
+    * to: /rosout
+    * direction: outbound
+    * transport: TCPROS
+ * topic: /turtle1/cmd_vel
+    * to: /turtlesim
+    * direction: outbound
+    * transport: TCPROS
+
+
+
+	paul@paul-VirtualBox:~$ sudo apt-get install ros-jade-rqt
+	[sudo] password for paul: 
+	Reading package lists... Done
+	Building dependency tree       
+	Reading state information... Done
+	The following NEW packages will be installed:
+	  ros-jade-rqt
+	0 upgraded, 1 newly installed, 0 to remove and 143 not upgraded.
+	Need to get 2,136 B of archives.
+	After this operation, 47.1 kB of additional disk space will be used.
+	Get:1 http://packages.ros.org/ros/ubuntu/ trusty/main ros-jade-rqt amd64 0.2.14-0trusty-20161127-191835-0800 [2,136 B]
+	Fetched 2,136 B in 0s (4,595 B/s) 
+	Selecting previously unselected package ros-jade-rqt.
+	(Reading database ... 231770 files and directories currently installed.)
+	Preparing to unpack .../ros-jade-rqt_0.2.14-0trusty-20161127-191835-0800_amd64.deb ...
+	Unpacking ros-jade-rqt (0.2.14-0trusty-20161127-191835-0800) ...
+	Setting up ros-jade-rqt (0.2.14-0trusty-20161127-191835-0800) ...
+
+	paul@paul-VirtualBox:~$ sudo apt-get install ros-jade-rqt-common-plugins
+	Reading package lists... Done
+	Building dependency tree       
+	Reading state information... Done
+	ros-jade-rqt-common-plugins is already the newest version.
+	ros-jade-rqt-common-plugins set to manually installed.
+	0 upgraded, 0 newly installed, 0 to remove and 143 not upgraded.
+	paul@paul-VirtualBox:~$ 
+
+rostopic echo + the topic will print the messages published to the topic
+
+paul@paul-VirtualBox:~$ rostopic echo /turtle1/cmd_vel
+
+	linear: 
+	  x: 0.0
+	  y: 0.0
+	  z: 0.0
+	angular: 
+	  x: 0.0
+	  y: 0.0
+	  z: -2.0
+	---
+	linear: 
+	  x: 0.0
+	  y: 0.0
+	  z: 0.0
+	angular: 
+	  x: 0.0
+	  y: 0.0
+	  z: -2.0
+
+
+rostopic list -v (verbose) will list any topics being published and subscribed
+
+	paul@paul-VirtualBox:~$ rostopic list -v
+
+	Published topics:
+	 * /turtle1/color_sensor [turtlesim/Color] 1 publisher
+	 * /turtle1/cmd_vel [geometry_msgs/Twist] 1 publisher
+	 * /rosout [rosgraph_msgs/Log] 4 publishers
+	 * /rosout_agg [rosgraph_msgs/Log] 1 publisher
+	 * /turtle1/pose [turtlesim/Pose] 1 publisher
+
+	Subscribed topics:
+	 * /turtle1/cmd_vel [geometry_msgs/Twist] 2 subscribers
+	 * /rosout [rosgraph_msgs/Log] 1 subscriber
+	 * /statistics [rosgraph_msgs/TopicStatistics] 1 subscriber
+
+
+Publishers and subscribers must both use the same message type within a topic.   
+
+	paul@paul-VirtualBox:~$ rostopic type /turtle1/cmd_vel
+	geometry_msgs/Twist
+
+
+rosmsg show for the message type will show the format for the message
+
+	paul@paul-VirtualBox:~$ rosmsg show geometry_msgs/Twist
+	geometry_msgs/Vector3 linear
+	  float64 x
+	  float64 y
+	  float64 z
+	geometry_msgs/Vector3 angular
+	  float64 x
+	  float64 y
+	  float64 z
+
+rostopic pub allows you to send a message directly to a topic 
+
+	rostopic pub [topic] [msg_type] [args]
+
+	Example:
+	paul@paul-VirtualBox:~$ rostopic pub -1 /turtle1/cmd_vel geometry_msgs/Twist -- '[2.0, 0.0, 0.0]' '[0.0, 0.0, 1.8]'
+	publishing and latching message for 3.0 seconds
+
+	
+	to publish the same message to the topic repeatedly with a frequency of 1 hz use:
+	paul@paul-VirtualBox:~$ rostopic pub /turtle1/cmd_vel geometry_msgs/Twist -r 1 -- '[2.0, 0.0, 0.0]' '[0.0, 0.0, -1.8]'
+
+paul@paul-VirtualBox:~$ rosrun rqt_plot rqt_plot
+
+
+rosservice lists the available services for each node. 
+	
+	Example:
+	
+	paul@paul-VirtualBox:~$ rosservice list
+	/clear
+	/kill
+	/reset
+	/rosout/get_loggers
+	/rosout/set_logger_level
+	/rostopic_3811_1486516848329/get_loggers
+	/rostopic_3811_1486516848329/set_logger_level
+	/rostopic_3901_1486518343207/get_loggers
+	/rostopic_3901_1486518343207/set_logger_level
+	/rostopic_3994_1486518694547/get_loggers
+	/rostopic_3994_1486518694547/set_logger_level
+	/rqt_gui_py_node_3765/get_loggers
+	/rqt_gui_py_node_3765/set_logger_level
+	/spawn
+	/teleop_turtle/get_loggers
+	/teleop_turtle/set_logger_level
+	/turtle1/set_pen
+	/turtle1/teleport_absolute
+	/turtle1/teleport_relative
+	/turtlesim/get_loggers
+	/turtlesim/set_logger_level
+
+
+	paul@paul-VirtualBox:~$ rosservice type /clear
+	std_srvs/Empty
+
+	paul@paul-VirtualBox:~$ rosservice type /clear
+	std_srvs/Empty
+
+	paul@paul-VirtualBox:~$ rosservice type /spawn
+	turtlesim/Spawn
+
+rosparam communicates with the ROS Param server using YAML. The Param server stores configuration settings available to the nodes via API
+
+	"Nodes use this server to store and retrieve parameters at runtime. As it is not designed for high-performance, it is best used for static, non-binary data such as configuration parameters. 
+	It is meant to be globally viewable so that tools can easily inspect the configuration state of the system and modify if necessary."
+
+	paul@paul-VirtualBox:~$ rosservice type /spawn| rossrv show
+	float32 x
+	float32 y
+	float32 theta
+	string name
+	---
+	string name
+
+
+	rosparam set            set parameter
+	rosparam get            get parameter
+	rosparam load           load parameters from file
+	rosparam dump           dump parameters to file
+	rosparam delete         delete parameter
+	rosparam list           list parameter names
+
+
+Sample data from the dump file to YAML:
+
+	background_b: 255
+	background_g: 86
+	background_r: 69
+	rosdistro: 'jade
+
+	  '
+	roslaunch:
+	  uris: {host_paul_virtualbox__43533: 'http://paul-VirtualBox:43533/'}
+	rosversion: '1.11.20
+
+	  '
+	run_id: 71784b68-ed96-11e6-b6a6-080027544776
+
+rosrun rqt_console rqt_console
+
+rosrun rqt_logger_level rqt_logger_level
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
