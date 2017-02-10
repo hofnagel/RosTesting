@@ -391,9 +391,301 @@ rosrun rqt_console rqt_console
 
 rosrun rqt_logger_level rqt_logger_level
 
+Creating a launch file - launch files will start all nodes when executed.  For best practice, a lunch directory can be created within the project.  But the roslaunch command will find valid launch files.
+
+paul@paul-VirtualBox:~/catkin_ws$ roscd beginner_tutorials
+roscd: No such package/stack 'beginner_tutorials'
+paul@paul-VirtualBox:~/catkin_ws$ source devel/setup.bash
+paul@paul-VirtualBox:~/catkin_ws$ roscd beginner_tutorials
+paul@paul-VirtualBox:~/catkin_ws/src/beginner_tutorials$ mkdir launch
+paul@paul-VirtualBox:~/catkin_ws/src/beginner_tutorials$ cd launch
+paul@paul-VirtualBox:~/catkin_ws/src/beginner_tutorials/launch$ 
+
+turtlemimic.launch
+
+	<launch>
+
+	  <group ns="turtlesim1">
+	    <node pkg="turtlesim" name="sim" type="turtlesim_node"/>
+	  </group>
+
+	  <group ns="turtlesim2">
+	    <node pkg="turtlesim" name="sim" type="turtlesim_node"/>
+	  </group>
+
+	  <node pkg="turtlesim" name="mimic" type="mimic">
+	    <remap from="input" to="turtlesim1/turtle1"/>
+	    <remap from="output" to="turtlesim2/turtle1"/>
+	  </node>
+
+	</launch>
 
 
+paul@paul-VirtualBox:~$ rostopic pub /turtlesim1/turtle1/cmd_vel geometry_msgs/Twist -r 1 -- '[2.0, 0.0, 0.0]' '[0.0, 0.0, -1.8]'
 
+
+rosed - edits a file within a package without needing to navigate to the package.  rosed uses the vim editor by default.  rosed is invoked using rosed [package] [filename]
+
+
+    msg: are simple text files that describe the fields of a ROS message. They are used to generate source code 	for messages in different languages.
+
+    srv: an srv file describes a service. It is composed of two parts: a request and a response. 
+
+msg files are stored in the msg directory of a package, and srv files are stored in the srv directory.
+
+msgs are just simple text files with a field type and field name per line. The field types you can use are:
+
+    int8, int16, int32, int64 (plus uint*)
+    float32, float64
+    string
+    time, duration
+    other msg files
+    variable-length array[] and fixed-length array[C] 
+
+There is also a special type in ROS: Header, the header contains a timestamp and coordinate frame information that are commonly used in ROS. You will frequently see the first line in a msg file have Header header.
+
+Here is an example of a msg that uses a Header, a string primitive, and two other msgs :
+
+  Header header
+  string child_frame_id
+  geometry_msgs/PoseWithCovariance pose
+  geometry_msgs/TwistWithCovariance twist
+
+srv files are just like msg files, except they contain two parts: a request and a response. The two parts are separated by a '---' line. Here is an example of a srv file:
+
+int64 A
+int64 B
+---
+int64 Sum
+
+In the above example, A and B are the request, and Sum is the response. 
+
+
+	paul@paul-VirtualBox:~/catkin_ws/src/beginner_tutorials$ mkdir msg
+	paul@paul-VirtualBox:~/catkin_ws/src/beginner_tutorials$ echo "int64 num" > msg/Num.msg
+	paul@paul-VirtualBox:~/catkin_ws/src/beginner_tutorials$ 
+
+
+	paul@paul-VirtualBox:~/catkin_ws/src/beginner_tutorials$ mkdir srv
+	paul@paul-VirtualBox:~/catkin_ws/src/beginner_tutorials$ roscp rospy_tutorials AddTwoInts.srv srv/AddTwoInts.srv
+	paul@paul-VirtualBox:~/catkin_ws/src/beginner_tutorials$ rosedit beginners_tutorials pacakge.xml
+	rosedit: command not found
+	paul@paul-VirtualBox:~/catkin_ws/src/beginner_tutorials$ rosed beginner_tutorials package.xml
+	paul@paul-VirtualBox:~/catkin_ws/src/beginner_tutorials$ rosed beginner_tutorials CMakeLists.txt
+	paul@paul-VirtualBox:~/catkin_ws/src/beginner_tutorials$ rossrv show beginner_tutorials AddTwoInts
+	Usage: rossrv show [options] <service type>
+
+	rossrv: error: you may only specify one service type
+	paul@paul-VirtualBox:~/catkin_ws/src/beginner_tutorials$ rossrv show beginner_tutorials/AddTwoInts
+	int64 a
+	int64 b
+	---
+	int64 sum
+
+	paul@paul-VirtualBox:~/catkin_ws/src/beginner_tutorials$ 
+
+
+	paul@paul-VirtualBox:~/catkin_ws/src/beginner_tutorials$ roscd beginner_tutorials
+	paul@paul-VirtualBox:~/catkin_ws/src/beginner_tutorials$ cd ../..
+	paul@paul-VirtualBox:~/catkin_ws$ catkin_make install
+	Base path: /home/paul/catkin_ws
+	Source space: /home/paul/catkin_ws/src
+	Build space: /home/paul/catkin_ws/build
+	Devel space: /home/paul/catkin_ws/devel
+	Install space: /home/paul/catkin_ws/install
+	####
+	#### Running command: "make cmake_check_build_system" in "/home/paul/catkin_ws/build"
+	####
+	-- Using CATKIN_DEVEL_PREFIX: /home/paul/catkin_ws/devel
+	-- Using CMAKE_PREFIX_PATH: /home/paul/catkin_ws/devel;/opt/ros/jade
+	-- This workspace overlays: /home/paul/catkin_ws/devel;/opt/ros/jade
+	-- Using PYTHON_EXECUTABLE: /usr/bin/python
+	-- Using Debian Python package layout
+	-- Using empy: /usr/bin/empy
+	-- Using CATKIN_ENABLE_TESTING: ON
+	-- Call enable_testing()
+	-- Using CATKIN_TEST_RESULTS_DIR: /home/paul/catkin_ws/build/test_results
+	-- Found gtest sources under '/usr/src/gtest': gtests will be built
+	-- Using Python nosetests: /usr/bin/nosetests-2.7
+	-- catkin 0.6.18
+	-- BUILD_SHARED_LIBS is on
+	-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	-- ~~  traversing 1 packages in topological order:
+	-- ~~  - beginner_tutorials
+	-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	-- +++ processing catkin package: 'beginner_tutorials'
+	-- ==> add_subdirectory(beginner_tutorials)
+	-- Using these message generators: gencpp;geneus;genlisp;genpy
+	-- beginner_tutorials: 1 messages, 1 services
+	-- Configuring done
+	-- Generating done
+	-- Build files have been written to: /home/paul/catkin_ws/build
+	####
+	#### Running command: "make install -j1 -l1" in "/home/paul/catkin_ws/build"
+	####
+	Scanning dependencies of target _beginner_tutorials_generate_messages_check_deps_Num
+	[  0%] Built target _beginner_tutorials_generate_messages_check_deps_Num
+	Scanning dependencies of target std_msgs_generate_messages_eus
+	[  0%] Built target std_msgs_generate_messages_eus
+	Scanning dependencies of target _beginner_tutorials_generate_messages_check_deps_AddTwoInts
+	[  0%] Built target _beginner_tutorials_generate_messages_check_deps_AddTwoInts
+	Scanning dependencies of target beginner_tutorials_generate_messages_eus
+	[  9%] Generating EusLisp code from beginner_tutorials/Num.msg
+	[ 18%] Generating EusLisp code from beginner_tutorials/AddTwoInts.srv
+	[ 27%] Generating EusLisp manifest code for beginner_tutorials
+	[ 27%] Built target beginner_tutorials_generate_messages_eus
+	Scanning dependencies of target std_msgs_generate_messages_lisp
+	[ 27%] Built target std_msgs_generate_messages_lisp
+	Scanning dependencies of target beginner_tutorials_generate_messages_lisp
+	[ 36%] Generating Lisp code from beginner_tutorials/Num.msg
+	[ 45%] Generating Lisp code from beginner_tutorials/AddTwoInts.srv
+	[ 45%] Built target beginner_tutorials_generate_messages_lisp
+	Scanning dependencies of target std_msgs_generate_messages_py
+	[ 45%] Built target std_msgs_generate_messages_py
+	Scanning dependencies of target beginner_tutorials_generate_messages_py
+	[ 54%] Generating Python from MSG beginner_tutorials/Num
+	[ 63%] Generating Python code from SRV beginner_tutorials/AddTwoInts
+	[ 72%] Generating Python msg __init__.py for beginner_tutorials
+	[ 81%] Generating Python srv __init__.py for beginner_tutorials
+	[ 81%] Built target beginner_tutorials_generate_messages_py
+	Scanning dependencies of target std_msgs_generate_messages_cpp
+	[ 81%] Built target std_msgs_generate_messages_cpp
+	Scanning dependencies of target beginner_tutorials_generate_messages_cpp
+	[ 90%] Generating C++ code from beginner_tutorials/Num.msg
+	[100%] Generating C++ code from beginner_tutorials/AddTwoInts.srv
+	[100%] Built target beginner_tutorials_generate_messages_cpp
+	Scanning dependencies of target beginner_tutorials_generate_messages
+	[100%] Built target beginner_tutorials_generate_messages
+	Install the project...
+	-- Install configuration: ""
+	-- Installing: /home/paul/catkin_ws/install/_setup_util.py
+	-- Installing: /home/paul/catkin_ws/install/env.sh
+	-- Installing: /home/paul/catkin_ws/install/setup.bash
+	-- Installing: /home/paul/catkin_ws/install/setup.sh
+	-- Installing: /home/paul/catkin_ws/install/setup.zsh
+	-- Installing: /home/paul/catkin_ws/install/.rosinstall
+	-- Installing: /home/paul/catkin_ws/install/share/beginner_tutorials/msg/Num.msg
+	-- Installing: /home/paul/catkin_ws/install/share/beginner_tutorials/srv/AddTwoInts.srv
+	-- Installing: /home/paul/catkin_ws/install/share/beginner_tutorials/cmake/beginner_tutorials-msg-paths.cmake
+	-- Installing: /home/paul/catkin_ws/install/include/beginner_tutorials
+	-- Installing: /home/paul/catkin_ws/install/include/beginner_tutorials/AddTwoIntsRequest.h
+	-- Installing: /home/paul/catkin_ws/install/include/beginner_tutorials/Num.h
+	-- Installing: /home/paul/catkin_ws/install/include/beginner_tutorials/AddTwoIntsResponse.h
+	-- Installing: /home/paul/catkin_ws/install/include/beginner_tutorials/AddTwoInts.h
+	-- Installing: /home/paul/catkin_ws/install/share/roseus/ros/beginner_tutorials
+	-- Installing: /home/paul/catkin_ws/install/share/roseus/ros/beginner_tutorials/msg
+	-- Installing: /home/paul/catkin_ws/install/share/roseus/ros/beginner_tutorials/msg/Num.l
+	-- Installing: /home/paul/catkin_ws/install/share/roseus/ros/beginner_tutorials/srv
+	-- Installing: /home/paul/catkin_ws/install/share/roseus/ros/beginner_tutorials/srv/AddTwoInts.l
+	-- Installing: /home/paul/catkin_ws/install/share/roseus/ros/beginner_tutorials/manifest.l
+	-- Installing: /home/paul/catkin_ws/install/share/common-lisp/ros/beginner_tutorials
+	-- Installing: /home/paul/catkin_ws/install/share/common-lisp/ros/beginner_tutorials/msg
+	-- Installing: /home/paul/catkin_ws/install/share/common-lisp/ros/beginner_tutorials/msg/_package_Num.lisp
+	-- Installing: /home/paul/catkin_ws/install/share/common-lisp/ros/beginner_tutorials/msg/beginner_tutorials-msg.asd
+	-- Installing: /home/paul/catkin_ws/install/share/common-lisp/ros/beginner_tutorials/msg/_package.lisp
+	-- Installing: /home/paul/catkin_ws/install/share/common-lisp/ros/beginner_tutorials/msg/Num.lisp
+	-- Installing: /home/paul/catkin_ws/install/share/common-lisp/ros/beginner_tutorials/srv
+	-- Installing: /home/paul/catkin_ws/install/share/common-lisp/ros/beginner_tutorials/srv/beginner_tutorials-srv.asd
+	-- Installing: /home/paul/catkin_ws/install/share/common-lisp/ros/beginner_tutorials/srv/AddTwoInts.lisp
+	-- Installing: /home/paul/catkin_ws/install/share/common-lisp/ros/beginner_tutorials/srv/_package.lisp
+	-- Installing: /home/paul/catkin_ws/install/share/common-lisp/ros/beginner_tutorials/srv/_package_AddTwoInts.lisp
+	Listing /home/paul/catkin_ws/devel/lib/python2.7/dist-packages/beginner_tutorials ...
+	Compiling /home/paul/catkin_ws/devel/lib/python2.7/dist-packages/beginner_tutorials/__init__.py ...
+	Listing /home/paul/catkin_ws/devel/lib/python2.7/dist-packages/beginner_tutorials/msg ...
+	Compiling /home/paul/catkin_ws/devel/lib/python2.7/dist-packages/beginner_tutorials/msg/_Num.py ...
+	Compiling /home/paul/catkin_ws/devel/lib/python2.7/dist-packages/beginner_tutorials/msg/__init__.py ...
+	Listing /home/paul/catkin_ws/devel/lib/python2.7/dist-packages/beginner_tutorials/srv ...
+	Compiling /home/paul/catkin_ws/devel/lib/python2.7/dist-packages/beginner_tutorials/srv/_AddTwoInts.py ...
+	Compiling /home/paul/catkin_ws/devel/lib/python2.7/dist-packages/beginner_tutorials/srv/__init__.py ...
+	-- Installing: /home/paul/catkin_ws/install/lib/python2.7/dist-packages/beginner_tutorials
+	-- Installing: /home/paul/catkin_ws/install/lib/python2.7/dist-packages/beginner_tutorials/msg
+	-- Installing: /home/paul/catkin_ws/install/lib/python2.7/dist-packages/beginner_tutorials/msg/_Num.pyc
+	-- Installing: /home/paul/catkin_ws/install/lib/python2.7/dist-packages/beginner_tutorials/msg/__init__.pyc
+	-- Installing: /home/paul/catkin_ws/install/lib/python2.7/dist-packages/beginner_tutorials/msg/__init__.py
+	-- Installing: /home/paul/catkin_ws/install/lib/python2.7/dist-packages/beginner_tutorials/msg/_Num.py
+	-- Installing: /home/paul/catkin_ws/install/lib/python2.7/dist-packages/beginner_tutorials/__init__.pyc
+	-- Installing: /home/paul/catkin_ws/install/lib/python2.7/dist-packages/beginner_tutorials/__init__.py
+	-- Installing: /home/paul/catkin_ws/install/lib/python2.7/dist-packages/beginner_tutorials/srv
+	-- Installing: /home/paul/catkin_ws/install/lib/python2.7/dist-packages/beginner_tutorials/srv/_AddTwoInts.py
+	-- Installing: /home/paul/catkin_ws/install/lib/python2.7/dist-packages/beginner_tutorials/srv/__init__.pyc
+	-- Installing: /home/paul/catkin_ws/install/lib/python2.7/dist-packages/beginner_tutorials/srv/__init__.py
+	-- Installing: /home/paul/catkin_ws/install/lib/python2.7/dist-packages/beginner_tutorials/srv/_AddTwoInts.pyc
+	-- Installing: /home/paul/catkin_ws/install/lib/pkgconfig/beginner_tutorials.pc
+	-- Installing: /home/paul/catkin_ws/install/share/beginner_tutorials/cmake/beginner_tutorials-msg-extras.cmake
+	-- Installing: /home/paul/catkin_ws/install/share/beginner_tutorials/cmake/beginner_tutorialsConfig.cmake
+	-- Installing: /home/paul/catkin_ws/install/share/beginner_tutorials/cmake/beginner_tutorialsConfig-version.cmake
+	-- Installing: /home/paul/catkin_ws/install/share/beginner_tutorials/package.xml
+	paul@paul-VirtualBox:~/catkin_ws$ cd -
+	/home/paul/catkin_ws/src/beginner_tutorials
+	paul@paul-VirtualBox:~/catkin_ws/src/beginner_tutorials$ 
+
+
+	paul@paul-VirtualBox:~/catkin_ws/src/beginner_tutorials$ mkdir scripts
+	paul@paul-VirtualBox:~/catkin_ws/src/beginner_tutorials$ cd scripts
+	paul@paul-VirtualBox:~/catkin_ws/src/beginner_tutorials/scripts$ wget https://raw.github.com/ros/ros_tutorials/kinetic-devel/rospy_tutorials/001_talker_listener/talker.py
+	--2017-02-09 21:22:02--  https://raw.github.com/ros/ros_tutorials/kinetic-devel/rospy_tutorials/001_talker_listener/talker.py
+	Resolving raw.github.com (raw.github.com)... 151.101.56.133
+	Connecting to raw.github.com (raw.github.com)|151.101.56.133|:443... connected.
+	HTTP request sent, awaiting response... 301 Moved Permanently
+	Location: https://raw.githubusercontent.com/ros/ros_tutorials/kinetic-devel/rospy_tutorials/001_talker_listener/talker.py [following]
+	--2017-02-09 21:22:02--  https://raw.githubusercontent.com/ros/ros_tutorials/kinetic-devel/rospy_tutorials/001_talker_listener/talker.py
+	Resolving raw.githubusercontent.com (raw.githubusercontent.com)... 151.101.128.133, 151.101.192.133, 151.101.64.133, ...
+	Connecting to raw.githubusercontent.com (raw.githubusercontent.com)|151.101.128.133|:443... connected.
+	HTTP request sent, awaiting response... 200 OK
+	Length: 2217 (2.2K) [text/plain]
+	Saving to: ‘talker.py’
+
+	100%[==================================================================================================================>] 2,217       --.-K/s   in 0s      
+
+	2017-02-09 21:22:02 (64.2 MB/s) - ‘talker.py’ saved [2217/2217]
+
+	paul@paul-VirtualBox:~/catkin_ws/src/beginner_tutorials/scripts$ chmod +x talker.py
+
+	paul@paul-VirtualBox:~/catkin_ws/src/beginner_tutorials/scripts$ wget https://raw.github.com/ros/ros_tutorials/kinetic-devel/rospy_tutorials/001_talker_listener/listener.py
+	--2017-02-09 21:28:43--  https://raw.github.com/ros/ros_tutorials/kinetic-devel/rospy_tutorials/001_talker_listener/listener.py
+	Resolving raw.github.com (raw.github.com)... 151.101.56.133
+	Connecting to raw.github.com (raw.github.com)|151.101.56.133|:443... connected.
+	HTTP request sent, awaiting response... 301 Moved Permanently
+	Location: https://raw.githubusercontent.com/ros/ros_tutorials/kinetic-devel/rospy_tutorials/001_talker_listener/listener.py [following]
+	--2017-02-09 21:28:43--  https://raw.githubusercontent.com/ros/ros_tutorials/kinetic-devel/rospy_tutorials/001_talker_listener/listener.py
+	Resolving raw.githubusercontent.com (raw.githubusercontent.com)... 151.101.128.133, 151.101.192.133, 151.101.64.133, ...
+	Connecting to raw.githubusercontent.com (raw.githubusercontent.com)|151.101.128.133|:443... connected.
+	HTTP request sent, awaiting response... 200 OK
+	Length: 2406 (2.3K) [text/plain]
+	Saving to: ‘listener.py’
+
+	100%[==============================================================================>] 2,406       --.-K/s   in 0s      
+
+	2017-02-09 21:28:44 (48.6 MB/s) - ‘listener.py’ saved [2406/2406]
+
+	paul@paul-VirtualBox:~/catkin_ws/src/beginner_tutorials/scripts$ chmod +x listener.py
+
+
+paul@paul-VirtualBox:~/catkin_ws/src/beginner_tutorials/scripts$ chmod +x listener.py
+paul@paul-VirtualBox:~/catkin_ws/src/beginner_tutorials/scripts$ cd ~/catkin_ws
+paul@paul-VirtualBox:~/catkin_ws$ catkin_make
+Base path: /home/paul/catkin_ws
+Source space: /home/paul/catkin_ws/src
+Build space: /home/paul/catkin_ws/build
+Devel space: /home/paul/catkin_ws/devel
+Install space: /home/paul/catkin_ws/install
+####
+#### Running command: "make cmake_check_build_system" in "/home/paul/catkin_ws/build"
+####
+####
+#### Running command: "make -j1 -l1" in "/home/paul/catkin_ws/build"
+####
+[  0%] Built target _beginner_tutorials_generate_messages_check_deps_Num
+[  0%] Built target std_msgs_generate_messages_eus
+[  0%] Built target _beginner_tutorials_generate_messages_check_deps_AddTwoInts
+[ 27%] Built target beginner_tutorials_generate_messages_eus
+[ 27%] Built target std_msgs_generate_messages_lisp
+[ 45%] Built target beginner_tutorials_generate_messages_lisp
+[ 45%] Built target std_msgs_generate_messages_py
+[ 81%] Built target beginner_tutorials_generate_messages_py
+[ 81%] Built target std_msgs_generate_messages_cpp
+[100%] Built target beginner_tutorials_generate_messages_cpp
+[100%] Built target beginner_tutorials_generate_messages
 
 
 
